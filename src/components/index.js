@@ -35,7 +35,6 @@ export {
   SaveExportDropdownFactory,
   ExportImageFactory,
   ExportDataFactory,
-  ExportConfigFactory,
   ExportMapFactory,
   SaveMapFactory
 } from './side-panel/panel-header'

@@ -55,7 +55,7 @@ import {
 } from './vis-state-merger';
 
 import {Layer, LayerClasses} from 'layers';
-import {processFileToLoad} from '/utils/file-utils';
+import {processFileToLoad} from 'utils/file-utils';
 import {DEFAULT_TEXT_LABEL} from 'layers/layer-factory';
 
 // react-palm
