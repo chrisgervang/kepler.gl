@@ -19,6 +19,7 @@
 // THE SOFTWARE.
 
 import {GeoJsonLayer, GridLayer as DeckGLGridLayer} from 'deck.gl';
+import GL from '@luma.gl/constants';
 import AggregationLayer from '../aggregation-layer';
 import EnhancedCPUGridLayer from 'deckgl-layers/grid-layer/enhanced-cpu-grid-layer';
 import {pointToPolygonGeo} from './grid-utils';
@@ -93,6 +94,15 @@ export default class GridLayer extends AggregationLayer {
     const {visConfig} = this.config;
     const cellSize = visConfig.worldUnitSize * 1000;
 
+    const PARAMETERS = {
+      depthTest: true,
+      depthMask: true,
+      depthFunc: GL.LESS,
+      blend: false,
+      polygonOffsetFill: false,
+      depthRange: [0, 1]
+    };
+
     return [
       new DeckGLGridLayer({
         ...data,
@@ -118,7 +128,8 @@ export default class GridLayer extends AggregationLayer {
         elevationLowerPercentile: visConfig.elevationPercentile[0],
         elevationUpperPercentile: visConfig.elevationPercentile[1],
         // parameters
-        parameters: {depthTest: Boolean(visConfig.enable3d || mapState.dragRotate)},
+        parameters: PARAMETERS,
+        // { depthTest: Boolean(visConfig.enable3d || mapState.dragRotate) },
 
         // render
         pickable: true,

@@ -45,7 +45,6 @@ export default class EnhancedCPUGridLayer extends CPUGridLayer {
   getColorScale() {
     getColorScaleFunction(this);
   }
-
 }
 
 EnhancedCPUGridLayer.layerName = 'EnhancedGridLayer';
