@@ -21,10 +21,11 @@
 // libraries
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import MapboxGLMap from 'react-map-gl';
+import MapboxGLMap, {StaticMap} from 'react-map-gl';
 import DeckGL from '@deck.gl/react';
 import {createSelector} from 'reselect';
 import WebMercatorViewport from 'viewport-mercator-project';
+import {Timeline} from '@luma.gl/addons';
 
 // components
 import MapPopoverFactory from 'components/map/map-popover';
@@ -93,7 +94,9 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       onMapStyleLoaded: PropTypes.func,
       onMapRender: PropTypes.func,
       getMapboxRef: PropTypes.func,
-      index: PropTypes.number
+      index: PropTypes.number,
+      getDeckRef: PropTypes.func,
+      hubble: PropTypes.bool
     };
 
     static defaultProps = {
@@ -168,6 +171,38 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         colorDomain
       });
     };
+
+    _deckOnLoad = () => {
+      if (this.props.hubble) {
+        const animationLoop = this.deck.animationLoop;
+        animationLoop.attachTimeline(new Timeline());
+      }
+
+      if (this.props.getDeckRef) {
+        // The parent component can gain access to our DeckGL by
+        // providing this callback. Note that 'deckgl' will be null when the
+        // ref is unset (e.g. when a split map is closed).
+        this.props.getDeckRef(this.deck);
+      }
+    };
+
+    _onWebGLInitialized = gl => {
+      this.gl = gl;
+      onWebGLInitialized(gl);
+      this.forceUpdate();
+      // allow Uint32 indices in building layer
+      // gl.getExtension('OES_element_index_uint');
+    };
+
+    // _onMouseMove = evt => {
+    //   const {interactionConfig: {brush}} = this.props;
+
+    //   if (evt.nativeEvent && brush.enabled) {
+    //     this.setState({
+    //       mousePosition: [evt.nativeEvent.offsetX, evt.nativeEvent.offsetY]
+    //     });
+    //   }
+    // };
 
     _handleMapToggleLayer = layerId => {
       const {index: mapIndex = 0, visStateActions} = this.props;
@@ -369,6 +404,8 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         <DeckGL
           {...this.props.deckGlProps}
           viewState={mapState}
+          height={'1080px'}
+          width={'1920px'}
           id="default-deckgl-overlay"
           layers={deckGlLayers}
           onBeforeRender={this._onBeforeRender}
@@ -379,7 +416,40 @@ export default function MapContainerFactory(MapPopover, MapControl) {
               this._deck = comp.deck;
             }
           }}
-        />
+          onWebGLInitialized={this._onWebGLInitialized}
+          onLoad={this._deckOnLoad}
+          controller={true}
+          onViewStateChange={({viewState}) => {
+            this._onViewportChange(viewState);
+          }}
+          _animate
+        >
+          {this.gl && (
+            <StaticMap
+              {...mapProps}
+              reuseMaps
+              ref={this._setMapboxMap}
+              // gl={this.gl}
+              mapStyle={mapStyle.bottomMapStyle}
+              preventStyleDiffing={true}
+              // onLoad={this._mapOnLoad}
+              mapOptions={{antialias: true}}
+            />
+          )}
+
+          {/* {this.gl && (
+            <MapboxGLMap
+              {...mapProps}
+              key="bottom"
+              ref={this._setMapboxMap}
+              mapStyle={mapStyle.bottomMapStyle}
+              onClick={onMapClick}
+              gl={this.gl}
+              getCursor={this.props.hoverInfo ? () => 'pointer' : undefined}
+              transitionDuration={TRANSITION_DURATION}
+            />
+          )} */}
+        </DeckGL>
       );
     }
 
@@ -474,7 +544,9 @@ export default function MapContainerFactory(MapPopover, MapControl) {
             onSetLocale={uiStateActions.setLocale}
             onToggleEditorVisibility={visStateActions.toggleEditorVisibility}
           />
-          <MapComponent
+          {this._renderDeckOverlay(layersToRender)}
+          {this._renderMapboxOverlays(layersToRender)}
+          {/* <MapComponent
             {...mapProps}
             key="bottom"
             ref={this._setMapboxMap}
@@ -508,7 +580,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
             <div style={MAP_STYLE.top}>
               <MapComponent {...mapProps} key="top" mapStyle={mapStyle.topMapStyle} />
             </div>
-          )}
+          )} */}
           {this._renderMapPopover(layersToRender)}
         </StyledMapContainer>
       );

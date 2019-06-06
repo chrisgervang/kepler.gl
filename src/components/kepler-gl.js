@@ -224,6 +224,9 @@ function KeplerGlFactory(
         mapboxApiAccessToken,
         mapboxApiUrl,
         getMapboxRef,
+        hubble,
+        getDeckRef,
+        onMapRender,
 
         // redux state
         mapStyle,
@@ -318,13 +321,28 @@ function KeplerGlFactory(
       const containerW = mapState.width * (Number(isSplit) + 1);
 
       const mapContainers = !isSplit
-        ? [<MapContainer key={0} index={0} {...mapFields} mapLayers={null} />]
+        ? [
+            <MapContainer
+              key={0}
+              index={0}
+              {...mapFields}
+              mapLayers={null}
+              getMapboxRef={getMapboxRef}
+              hubble={hubble}
+              getDeckRef={getDeckRef}
+              onMapRender={onMapRender}
+            />
+          ]
         : splitMaps.map((settings, index) => (
             <MapContainer
               key={index}
               index={index}
               {...mapFields}
               mapLayers={splitMaps[index].layers}
+              getMapboxRef={getMapboxRef}
+              hubble={hubble}
+              getDeckRef={getDeckRef}
+              onMapRender={onMapRender}
             />
           ));
 

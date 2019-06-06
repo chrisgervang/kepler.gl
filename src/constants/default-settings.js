@@ -228,7 +228,7 @@ export const DEFAULT_MAP_STYLES = [
   {
     id: 'dark',
     label: 'Dark',
-    url: 'mapbox://styles/uberdata/cjoqbbf6l9k302sl96tyvka09',
+    url: 'tools-dark-elevate.json', // 'mapbox://styles/uberdata/cjoqbbf6l9k302sl96tyvka09',
     icon: `${ICON_PREFIX}/UBER_DARK_V2.png`,
     layerGroups: DEFAULT_LAYER_GROUPS
   },
