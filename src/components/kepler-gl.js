@@ -184,6 +184,9 @@ function KeplerGlFactory(
         height,
         mapboxApiAccessToken,
         getMapboxRef,
+        hubble,
+        getDeckRef,
+        onMapRender,
 
         // redux state
         mapStyle,
@@ -267,6 +270,9 @@ function KeplerGlFactory(
               {...mapFields}
               mapLayers={isSplit ? splitMaps[0].layers : null}
               getMapboxRef={getMapboxRef}
+              hubble={hubble}
+              getDeckRef={getDeckRef}
+              onMapRender={onMapRender}
             />
           ]
         : splitMaps.map((settings, index) => (
@@ -276,6 +282,9 @@ function KeplerGlFactory(
               {...mapFields}
               mapLayers={splitMaps[index].layers}
               getMapboxRef={getMapboxRef}
+              hubble={hubble}
+              getDeckRef={getDeckRef}
+              onMapRender={onMapRender}
             />
           ));
 
@@ -302,7 +311,7 @@ function KeplerGlFactory(
             <div className="maps" style={{display: 'flex'}}>
               {mapContainers}
             </div>
-            {isExporting &&
+            {isExporting && (
               <PlotContainer
                 width={width}
                 height={height}
@@ -313,7 +322,7 @@ function KeplerGlFactory(
                 setExportImageDataUri={uiStateActions.setExportImageDataUri}
                 setExportImageError={uiStateActions.setExportImageError}
               />
-            }
+            )}
             <BottomWidget
               filters={filters}
               datasets={datasets}

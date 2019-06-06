@@ -21,8 +21,9 @@
 // libraries
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import MapboxGLMap from 'react-map-gl';
+import MapboxGLMap, {StaticMap} from 'react-map-gl';
 import DeckGL from 'deck.gl';
+import {Timeline} from '@luma.gl/addons';
 
 // components
 import MapPopoverFactory from 'components/map/map-popover';
@@ -43,7 +44,9 @@ const MAP_STYLE = {
     position: 'relative'
   },
   top: {
-    position: 'absolute', top: '0px', pointerEvents: 'none'
+    position: 'absolute',
+    top: '0px',
+    pointerEvents: 'none'
   }
 };
 
@@ -81,7 +84,9 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       onMapToggleLayer: PropTypes.func,
       onMapStyleLoaded: PropTypes.func,
       onMapRender: PropTypes.func,
-      getMapboxRef: PropTypes.func
+      getMapboxRef: PropTypes.func,
+      getDeckRef: PropTypes.func,
+      hubble: PropTypes.bool
     };
 
     static defaultProps = {
@@ -117,8 +122,24 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       });
     };
 
+    _deckOnLoad = () => {
+      if (this.props.hubble) {
+        const animationLoop = this.deckgl.deck.animationLoop;
+        animationLoop.attachTimeline(new Timeline());
+      }
+
+      if (this.props.getDeckRef) {
+        // The parent component can gain access to our DeckGL by
+        // providing this callback. Note that 'deckgl' will be null when the
+        // ref is unset (e.g. when a split map is closed).
+        this.props.getDeckRef(this.deckgl.deck);
+      }
+    };
+
     _onWebGLInitialized = gl => {
+      this.gl = gl;
       onWebGLInitialized(gl);
+      this.forceUpdate();
       // allow Uint32 indices in building layer
       // gl.getExtension('OES_element_index_uint');
     };
@@ -317,7 +338,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       return overlays;
     };
 
-    _renderOverlay() {
+    _renderOverlay(onMapClick, mapProps) {
       const {
         mapState,
         mapStyle,
@@ -349,13 +370,48 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       return (
         <DeckGL
           viewState={mapState}
+          height={'1080px'}
+          width={'1920px'}
           id="default-deckgl-overlay"
+          ref={r => (this.deckgl = r)}
           layers={deckGlLayers}
           onWebGLInitialized={this._onWebGLInitialized}
+          onLoad={this._deckOnLoad}
           onBeforeRender={this._onBeforeRender}
           onHover={visStateActions.onLayerHover}
           onClick={visStateActions.onLayerClick}
-        />
+          controller={true}
+          onViewStateChange={({viewState}) => {
+            this._onViewportChange(viewState);
+          }}
+          _animate
+        >
+          {this.gl && (
+            <StaticMap
+              {...mapProps}
+              reuseMaps
+              ref={this._setMapboxMap}
+              // gl={this.gl}
+              mapStyle={mapStyle.bottomMapStyle}
+              preventStyleDiffing={true}
+              // onLoad={this._mapOnLoad}
+              mapOptions={{antialias: true}}
+            />
+          )}
+
+          {/* {this.gl && (
+            <MapboxGLMap
+              {...mapProps}
+              key="bottom"
+              ref={this._setMapboxMap}
+              mapStyle={mapStyle.bottomMapStyle}
+              onClick={onMapClick}
+              gl={this.gl}
+              getCursor={this.props.hoverInfo ? () => 'pointer' : undefined}
+              transitionDuration={TRANSITION_DURATION}
+            />
+          )} */}
+        </DeckGL>
       );
     }
 
@@ -433,19 +489,20 @@ export default function MapContainerFactory(MapPopover, MapControl) {
             onMapToggleLayer={this._handleMapToggleLayer}
             onToggleMapControl={toggleMapControl}
           />
-          <MapComponent
+          {this._renderOverlay(onMapClick, mapProps)}
+          {this._renderMapboxOverlays()}
+          {/* <MapComponent
             {...mapProps}
             key="bottom"
             ref={this._setMapboxMap}
             mapStyle={mapStyle.bottomMapStyle}
             onClick={onMapClick}
+            gl={gl}
             getCursor={this.props.hoverInfo ? () => 'pointer' : undefined}
             transitionDuration={TRANSITION_DURATION}
-          >
-            {this._renderOverlay()}
-            {this._renderMapboxOverlays()}
-          </MapComponent>
-          {mapStyle.topMapStyle && (
+          /> */}
+
+          {/* {mapStyle.topMapStyle && this.gl && (
             <div style={MAP_STYLE.top}>
               <MapComponent
                 {...mapProps}
@@ -453,7 +510,8 @@ export default function MapContainerFactory(MapPopover, MapControl) {
                 mapStyle={mapStyle.topMapStyle}
               />
             </div>
-          )}
+          )} */}
+
           {this._renderObjectLayerPopover()}
         </StyledMapContainer>
       );
