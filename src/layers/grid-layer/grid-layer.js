@@ -98,7 +98,7 @@ export default class GridLayer extends AggregationLayer {
       depthTest: true,
       depthMask: true,
       depthFunc: GL.LESS,
-      blend: false,
+      blend: true,
       polygonOffsetFill: false,
       depthRange: [0, 1]
     };
