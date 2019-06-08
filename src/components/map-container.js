@@ -429,7 +429,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
               {...mapProps}
               reuseMaps
               ref={this._setMapboxMap}
-              // gl={this.gl}
+              gl={this.gl}
               mapStyle={mapStyle.bottomMapStyle}
               preventStyleDiffing={true}
               // onLoad={this._mapOnLoad}
