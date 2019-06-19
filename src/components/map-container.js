@@ -46,8 +46,7 @@ import {FILTER_TYPES} from 'constants/default-settings';
 
 const MAP_STYLE = {
   container: {
-    display: 'inline-block',
-    position: 'relative'
+    display: 'inline-block'
   },
   top: {
     position: 'absolute',
@@ -406,6 +405,8 @@ export default function MapContainerFactory(MapPopover, MapControl) {
           viewState={mapState}
           height={'1080px'}
           width={'1920px'}
+          // height={'2160px'}
+          // width={'3840px'}
           id="default-deckgl-overlay"
           layers={deckGlLayers}
           onBeforeRender={this._onBeforeRender}
