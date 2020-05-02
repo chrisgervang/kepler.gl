@@ -32,7 +32,7 @@ import MapPopoverFactory from 'components/map/map-popover';
 import MapControlFactory from 'components/map/map-control';
 import {StyledMapContainer} from 'components/common/styled-components';
 
-import Editor from './editor/editor';
+// import Editor from './editor/editor';
 
 // utils
 import {generateMapboxLayers, updateMapboxLayers} from 'layers/mapbox-utils';
@@ -57,7 +57,7 @@ const MAP_STYLE = {
 
 const MAPBOXGL_STYLE_UPDATE = 'style.load';
 const MAPBOXGL_RENDER = 'render';
-const TRANSITION_DURATION = 0;
+// const TRANSITION_DURATION = 0;
 
 MapContainerFactory.deps = [MapPopoverFactory, MapControlFactory];
 
@@ -491,7 +491,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         mapStateActions,
         mapLayers,
         layers,
-        MapComponent,
+        // MapComponent,
         datasets,
         mapboxApiAccessToken,
         mapboxApiUrl,
@@ -519,7 +519,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         transformRequest
       };
 
-      const isEdit = uiState.mapControls.mapDraw.active;
+      // const isEdit = uiState.mapControls.mapDraw.active;
 
       return (
         <StyledMapContainer style={MAP_STYLE.container}>
