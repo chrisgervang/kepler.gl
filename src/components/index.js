@@ -87,7 +87,7 @@ export {default as AnimationControlFactory} from './common/animation-control/ani
 export {default as SpeedControlFactory} from './common/animation-control/speed-control';
 export {default as AnimationPlaybacksFactory} from './common/animation-control/playback-controls';
 export {default as FloatingTimeDisplayFactory} from './common/animation-control/floating-time-display';
-export {default as DatasetSquare} from './common/styled-components';
+export {DatasetSquare} from './common/styled-components';
 
 // // Filters
 export {default as TimeWidgetFactory} from './filters/time-widget';
