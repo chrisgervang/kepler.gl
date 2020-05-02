@@ -25,7 +25,7 @@ import MapboxGLMap, {StaticMap} from 'react-map-gl';
 import DeckGL from '@deck.gl/react';
 import {createSelector} from 'reselect';
 import WebMercatorViewport from 'viewport-mercator-project';
-import {Timeline} from '@luma.gl/addons';
+import {Timeline} from '@luma.gl/engine';
 
 // components
 import MapPopoverFactory from 'components/map/map-popover';
@@ -173,7 +173,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
 
     _deckOnLoad = () => {
       if (this.props.hubble) {
-        const animationLoop = this.deck.animationLoop;
+        const animationLoop = this._deck.animationLoop;
         animationLoop.attachTimeline(new Timeline());
       }
 
@@ -181,13 +181,13 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         // The parent component can gain access to our DeckGL by
         // providing this callback. Note that 'deckgl' will be null when the
         // ref is unset (e.g. when a split map is closed).
-        this.props.getDeckRef(this.deck);
+        this.props.getDeckRef(this._deck);
       }
     };
 
     _onWebGLInitialized = gl => {
       this.gl = gl;
-      onWebGLInitialized(gl);
+      // onWebGLInitialized(gl);
       this.forceUpdate();
       // allow Uint32 indices in building layer
       // gl.getExtension('OES_element_index_uint');
@@ -360,7 +360,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       return overlays.concat(layerOverlay || []);
     };
 
-    _renderDeckOverlay(layersToRender) {
+    _renderDeckOverlay(layersToRender, mapProps) {
       const {
         mapState,
         mapStyle,
@@ -545,7 +545,7 @@ export default function MapContainerFactory(MapPopover, MapControl) {
             onSetLocale={uiStateActions.setLocale}
             onToggleEditorVisibility={visStateActions.toggleEditorVisibility}
           />
-          {this._renderDeckOverlay(layersToRender)}
+          {this._renderDeckOverlay(layersToRender, mapProps)}
           {this._renderMapboxOverlays(layersToRender)}
           {/* <MapComponent
             {...mapProps}
